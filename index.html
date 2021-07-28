@@ -39,7 +39,11 @@
                 <div>
                     <button @click="aumentar">+</button>
                     <button @click="disminuir(2)">-</button>
+                    <button @click="obtenerCursos">Obtener cursos</button>
                     <h1>numero {{ numero }}</h1>
+                    <ul v-for="(item, index) in cursos" :key="index">
+                        <li>{{ item.nombre }} {{ index }}</li>
+                    </ul>
                 </div>
 
                 `,
@@ -49,17 +53,19 @@
                      }*/
                      //mapstate: mapeamos todo el state, 
                      //hacemos spread operator para maperar todo lo que està en el state (clonar)
-                     ...Vuex.mapState(['numero'])
+                     ...Vuex.mapState(['numero', 'cursos'])
                  },
                  methods: {
-                     ...Vuex.mapMutations(['aumentar', 'disminuir'])
+                     ...Vuex.mapMutations(['aumentar', 'disminuir']),
+                     ...Vuex.mapActions(['obtenerCursos'])
                  }
 
             });
 
             const store = new Vuex.Store({
                 state: {
-                    numero: 10
+                    numero: 10,
+                    cursos: []
                 },
                 mutations: {
                     aumentar( state ) {
@@ -69,6 +75,17 @@
                     },
                     disminuir ( state, n ) {
                         state.numero -= n;
+                    },
+                    llenarCursos ( state, cursosAccion) {
+                        state.cursos = cursosAccion
+                    }
+                },
+                actions: {
+                    obtenerCursos: async function ({ commit }) {
+                        const data = await fetch ('curso.json');
+                        const cursos = await data.json();
+                        console.log(cursos);
+                        commit('llenarCursos', cursos)
                     }
                 }
             });
